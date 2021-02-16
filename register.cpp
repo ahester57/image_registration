@@ -43,6 +43,9 @@ main(int argc, const char** argv)
     std::string warpFilename;
     bool manual;
     float epsilon;
+    std::string motionType;
+    std::string outputWarp;
+    std::string warpImgFilename;
 
     // parse and save command line args
     int parse_result = parse_arguments(
@@ -51,7 +54,10 @@ main(int argc, const char** argv)
         &templateFilename,
         &warpFilename,
         &manual,
-        &epsilon
+        &epsilon,
+        &motionType,
+        &outputWarp,
+        &warpImgFilename
     );
     if (parse_result != 1) return parse_result;
 

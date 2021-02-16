@@ -40,7 +40,7 @@ Usage: register.exe [params] imagefile templatefile warpfile
                 ECC's Convergence Epsilon
         -h, --help (value:true)
                 Show Help Message
-        -m, --manual
+        -M, --manual
                 Perform Manual Registration
         -m, --motion, --type (value:affine)
                 Type of Motion: translation/euclidean/affine

@@ -15,15 +15,18 @@ parse_arguments(
     std::string* templateFilename,
     std::string* warpFilename,
     bool* manual,
-    float* epsilon
+    float* epsilon,
+    std::string* motionType,
+    std::string* outputWarp,
+    std::string* warpImgFilename
 ) {
     cv::String keys =
         "{@imagefile      |<none>         | Input Image}"
         "{@templatefile   |<none>         | Template Image}"
         "{@warpfile       |<none>         | Warp Matrix}"
-        "{manual m        |               | Perform Manual Registration}"
+        "{manual M        |               | Perform Manual Registration}"
         "{epsilon e       |0.0001         | ECC's Convergence Epsilon}"
-        "{motion type m   |affine         | Type of Motion: translation/euclidean/affine}"
+        "{motion_type m   |affine         | Type of Motion: translation/euclidean/affine}"
         "{output_warp o   |out_warp.ecc   | Output warp matrix filename}"
         "{warp_img_file w |warped_ecc.jpg | Output warp image}"
         "{help h          |               | Show Help Message}";
@@ -64,7 +67,7 @@ parse_arguments(
     }
 
     try {
-        *manual = (bool) parser.has("m");
+        *manual = (bool) parser.has("M");
     } catch (...) {
         std::cerr << "Failed to parse manual argument." << std::endl;
         return -1;
@@ -74,6 +77,27 @@ parse_arguments(
         *epsilon = parser.get<float>("e");
     } catch (...) {
         std::cerr << "Failed to parse epsilon argument!:" << std::endl;
+        return -1;
+    }
+
+    try {
+        *motionType = (std::string) parser.get<std::string>("m").c_str();
+    } catch (...) {
+        std::cerr << "Failed to parse motion_type argument!:" << std::endl;
+        return -1;
+    }
+
+    try {
+        *outputWarp = (std::string) parser.get<std::string>("o").c_str();
+    } catch (...) {
+        std::cerr << "Failed to parse output_warp argument!:" << std::endl;
+        return -1;
+    }
+
+    try {
+        *warpImgFilename = (std::string) parser.get<std::string>("w").c_str();
+    } catch (...) {
+        std::cerr << "Failed to parse warp_img_filename argument!:" << std::endl;
         return -1;
     }
 
