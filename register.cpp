@@ -22,6 +22,7 @@ struct ManualState {
     cv::Mat* image;
     cv::Mat* imageWithPoints;
     std::vector<cv::Point> points;
+    int maxPoints;
 };
 
 // 'event loop' for keypresses
@@ -72,6 +73,7 @@ mouse_callback(int event, int x, int y, int d, void* userdata)
 
     switch (event) {
         case cv::EVENT_LBUTTONUP:
+            if (state->points.size() >= state->maxPoints) break;
             state->points.push_back(cv::Point(x, y));
             // std::cout << "-----" << std::endl;
             // for (auto p : state->points) {
@@ -146,11 +148,13 @@ main(int argc, const char** argv)
     cv::Mat templateImageWithPoints;
 
     if (manual) {
-        equalGrayInputImage.copyTo(inputImageWithPoints);
         ManualState inputState = { &equalGrayTitle, &equalGrayInputImage, &inputImageWithPoints };
+        equalGrayInputImage.copyTo(inputImageWithPoints);
+        inputState.maxPoints = motionType == cv::MOTION_HOMOGRAPHY ? 9 : 6;
 
-        equalTemplateImage.copyTo(templateImageWithPoints);
         ManualState templateState = { &equalTemplateTitle, &equalTemplateImage, &templateImageWithPoints };
+        equalTemplateImage.copyTo(templateImageWithPoints);
+        templateState.maxPoints = motionType == cv::MOTION_HOMOGRAPHY ? 9 : 6;
 
         cv::setMouseCallback(equalGrayTitle, mouse_callback, &inputState);
         cv::setMouseCallback(equalTemplateTitle, mouse_callback, &templateState);
