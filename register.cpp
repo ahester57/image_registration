@@ -34,6 +34,29 @@ wait_key()
 }
 
 
+void
+initialize_images(
+    const std::string imageFilename,
+    const std::string templateFilename,
+    cv::Mat* inputImage,
+    cv::Mat* equalGrayInputImage,
+    cv::Mat* equalTemplateImage
+) {
+    // open image as color
+    *inputImage = open_image(imageFilename.c_str(), false);
+
+    // convert input image to grayscale
+    cv::cvtColor(*inputImage, *equalGrayInputImage, cv::COLOR_BGR2GRAY);
+    // equalize grayscale input image
+    cv::equalizeHist(*equalGrayInputImage, *equalGrayInputImage);
+
+    // read template image as grayscale
+    *equalTemplateImage = open_image(templateFilename.c_str(), true);
+    // equalize template input image
+    cv::equalizeHist(*equalTemplateImage, *equalTemplateImage);
+}
+
+
 int
 main(int argc, const char** argv)
 {
@@ -61,17 +84,35 @@ main(int argc, const char** argv)
     );
     if (parse_result != 1) return parse_result;
 
+    // initialize images
     cv::Mat inputImage;
-    // open image, grayscale = false
-    inputImage = open_image(imageFilename.c_str(), false);
+    cv::Mat equalGrayInputImage;
+    cv::Mat equalTemplateImage;
+
+    initialize_images(
+        imageFilename,
+        templateFilename,
+        &inputImage,
+        &equalGrayInputImage,
+        &equalTemplateImage
+    );
 
     std::cout << "\nShortcuts:\n\tq\t- quit\n";
 
     // image registration
-    cv::imshow(WINDOW_NAME + " Input Image", inputImage);
+    cv::imshow(WINDOW_NAME + " Input Image", inputImage);    while (wait_key());
+
+    cv::imshow(WINDOW_NAME + " Equalized Grayscale Image", equalGrayInputImage);    while (wait_key());
+
+    cv::imshow(WINDOW_NAME + " Template Image", equalTemplateImage);
+
 
     // 'event loop' for keypresses
     while (wait_key());
+
+    inputImage.release();
+    equalGrayInputImage.release();
+    equalTemplateImage.release();
 
     return 0;
 }
