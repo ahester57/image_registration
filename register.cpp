@@ -58,6 +58,18 @@ initialize_images(
 }
 
 
+void
+mouse_callback(int event, int x, int y, int d, void* userdata)
+{
+    std::vector<cv::Point>* points = (std::vector<cv::Point>*) userdata;
+    switch (event) {
+        case cv::EVENT_LBUTTONUP:
+            points->push_back(cv::Point(x, y));
+            break;
+    }
+}
+
+
 int
 main(int argc, const char** argv)
 {
@@ -107,6 +119,12 @@ main(int argc, const char** argv)
 
     cv::imshow(WINDOW_NAME + " Template Image", equalTemplateImage);
 
+    if (manual) {
+        std::vector<cv::Point> inputPoints;
+        std::vector<cv::Point> templatePoints;
+        cv::setMouseCallback(WINDOW_NAME + " Equalized Grayscale Image", mouse_callback, &inputPoints);
+        cv::setMouseCallback(WINDOW_NAME + " Template Image", mouse_callback, &templatePoints);
+    }
 
     // 'event loop' for keypresses
     while (wait_key());
