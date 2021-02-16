@@ -17,6 +17,13 @@
 const std::string WINDOW_NAME = "Image Registration";
 
 
+struct ManualState {
+    std::string* windowName;
+    cv::Mat* image;
+    cv::Mat* imageWithPoints;
+    std::vector<cv::Point> points;
+};
+
 // 'event loop' for keypresses
 int
 wait_key()
@@ -61,10 +68,24 @@ initialize_images(
 void
 mouse_callback(int event, int x, int y, int d, void* userdata)
 {
-    std::vector<cv::Point>* points = (std::vector<cv::Point>*) userdata;
+    ManualState* state = (ManualState*) userdata;
+
     switch (event) {
         case cv::EVENT_LBUTTONUP:
-            points->push_back(cv::Point(x, y));
+            state->points.push_back(cv::Point(x, y));
+            // std::cout << "-----" << std::endl;
+            // for (auto p : state->points) {
+            //     std::cout << p << "\t";
+            // }
+            // std::cout << std::endl;
+            // draw a circle on the image to show where they've clicked
+            cv::circle(
+                *(state->imageWithPoints),
+                cv::Point(x, y), 5,
+                cv::Scalar(255),
+                cv::FILLED, cv::LINE_8
+            );
+            cv::imshow(*(state->windowName), *(state->imageWithPoints));
             break;
     }
 }
@@ -115,15 +136,24 @@ main(int argc, const char** argv)
     // image registration
     cv::imshow(WINDOW_NAME + " Input Image", inputImage);    while (wait_key());
 
-    cv::imshow(WINDOW_NAME + " Equalized Grayscale Image", equalGrayInputImage);    while (wait_key());
+    std::string equalGrayTitle = WINDOW_NAME + " Equalized Grayscale Image";
+    cv::imshow(equalGrayTitle, equalGrayInputImage);
 
-    cv::imshow(WINDOW_NAME + " Template Image", equalTemplateImage);
+    std::string equalTemplateTitle = WINDOW_NAME + " Template Image";
+    cv::imshow(equalTemplateTitle, equalTemplateImage);
+
+    cv::Mat inputImageWithPoints;
+    cv::Mat templateImageWithPoints;
 
     if (manual) {
-        std::vector<cv::Point> inputPoints;
-        std::vector<cv::Point> templatePoints;
-        cv::setMouseCallback(WINDOW_NAME + " Equalized Grayscale Image", mouse_callback, &inputPoints);
-        cv::setMouseCallback(WINDOW_NAME + " Template Image", mouse_callback, &templatePoints);
+        equalGrayInputImage.copyTo(inputImageWithPoints);
+        ManualState inputState = { &equalGrayTitle, &equalGrayInputImage, &inputImageWithPoints };
+
+        equalTemplateImage.copyTo(templateImageWithPoints);
+        ManualState templateState = { &equalTemplateTitle, &equalTemplateImage, &templateImageWithPoints };
+
+        cv::setMouseCallback(equalGrayTitle, mouse_callback, &inputState);
+        cv::setMouseCallback(equalTemplateTitle, mouse_callback, &templateState);
     }
 
     // 'event loop' for keypresses
@@ -132,6 +162,8 @@ main(int argc, const char** argv)
     inputImage.release();
     equalGrayInputImage.release();
     equalTemplateImage.release();
+    inputImageWithPoints.release();
+    templateImageWithPoints.release();
 
     return 0;
 }
