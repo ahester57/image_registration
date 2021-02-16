@@ -16,7 +16,7 @@ int parse_arguments(
     std::string* warpFilename,
     bool* manual,
     float* epsilon,
-    std::string* motionType,
+    int* motionType,
     std::string* outputWarp,
     std::string* warpImgFilename
 );

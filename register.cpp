@@ -5,9 +5,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/video/tracking.hpp>
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #include "./include/cla_parse.hpp"
 #include "./include/dir_func.hpp"
@@ -66,7 +67,7 @@ main(int argc, const char** argv)
     std::string warpFilename;
     bool manual;
     float epsilon;
-    std::string motionType;
+    int motionType;
     std::string outputWarp;
     std::string warpImgFilename;
 
