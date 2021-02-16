@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "./include/cla_parse.hpp"
+#include "./include/dir_func.hpp"
 
 
 const std::string WINDOW_NAME = "Image Registration";
@@ -54,9 +55,14 @@ main(int argc, const char** argv)
     );
     if (parse_result != 1) return parse_result;
 
+    cv::Mat inputImage;
+    // open image, grayscale = false
+    inputImage = open_image(imageFilename.c_str(), false);
+
     std::cout << "\nShortcuts:\n\tq\t- quit\n";
 
     // image registration
+    cv::imshow(WINDOW_NAME + " Input Image", inputImage);
 
     // 'event loop' for keypresses
     while (wait_key());

@@ -18,12 +18,15 @@ parse_arguments(
     float* epsilon
 ) {
     cv::String keys =
-        "{@imagefile    |<none>| Input Image}"
-        "{@templatefile |<none>| Template Image}"
-        "{@warpfile     |<none>| Warp Matrix}"
-        "{manual m      |      | Perform Manual Registration}"
-        "{epsilon e     |      | ECC's Convergence Epsilon}"
-        "{help h        |      | Show Help Message}";
+        "{@imagefile      |<none>         | Input Image}"
+        "{@templatefile   |<none>         | Template Image}"
+        "{@warpfile       |<none>         | Warp Matrix}"
+        "{manual m        |               | Perform Manual Registration}"
+        "{epsilon e       |0.0001         | ECC's Convergence Epsilon}"
+        "{motion type m   |affine         | Type of Motion: translation/euclidean/affine}"
+        "{output_warp o   |out_warp.ecc   | Output warp matrix filename}"
+        "{warp_img_file w |warped_ecc.jpg | Output warp image}"
+        "{help h          |               | Show Help Message}";
 
     cv::CommandLineParser parser(argc, argv, keys);
 
@@ -40,6 +43,7 @@ parse_arguments(
 
     try {
         *imageFilename = (std::string) parser.get<std::string>(0).c_str();
+        assert(imageFilename->size() > 0);
     } catch (...) {
         std::cerr << "Failed to parse imagefile argument!:" << std::endl;
         return -1;

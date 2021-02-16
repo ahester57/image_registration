@@ -36,12 +36,18 @@ input image.
 ```
 Usage: register.exe [params] imagefile templatefile warpfile
 
-        -e, --epsilon
+        -e, --epsilon (value:0.0001)
                 ECC's Convergence Epsilon
         -h, --help (value:true)
                 Show Help Message
         -m, --manual
                 Perform Manual Registration
+        -m, --motion, --type (value:affine)
+                Type of Motion: translation/euclidean/affine
+        -o, --output_warp (value:out_warp.ecc)
+                Output warp matrix filename
+        -w, --warp_img_file (value:warped_ecc.jpg)
+                Output warp image
 
         imagefile (value:<none>)
                 Input Image
