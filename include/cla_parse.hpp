@@ -11,14 +11,14 @@
 int parse_arguments(
     int argc,
     const char** argv,
-    std::string* imageFilename,
-    std::string* templateFilename,
-    std::string* warpFilename,
+    std::string* image_filename,
+    std::string* template_filename,
+    std::string* warp_filename,
     bool* manual,
     float* epsilon,
-    int* motionType,
-    std::string* outputWarp,
-    std::string* warpImgFilename
+    int* motion_type,
+    std::string* output_warp,
+    std::string* warp_img_filename
 );
 
 #endif

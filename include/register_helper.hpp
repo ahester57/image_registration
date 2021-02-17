@@ -11,22 +11,22 @@
 
 
 struct ManualState {
-    std::string* windowName;
-    cv::Mat* imageWithPoints;
-    int maxPoints;
+    std::string* window_name;
+    cv::Mat* image_with_points;
+    int max_points;
     std::vector<cv::Point> points;
 };
 
 void
 initialize_images(
-    const std::string imageFilename,
-    const std::string templateFilename,
-    cv::Mat* inputImage,
-    cv::Mat* equalGrayInputImage,
-    cv::Mat* equalTemplateImage
+    const std::string image_filename,
+    const std::string template_filename,
+    cv::Mat* input_image,
+    cv::Mat* equal_gray_input_image,
+    cv::Mat* equal_template_image
 );
 
 void mouse_callback_pick_points(int event, int x, int y, int d, void* userdata);
-ManualState initialize_callback(std::string* windowName, cv::Mat* image, int maxPoints);
+ManualState initialize_callback(std::string* window_name, cv::Mat* image, int max_points);
 
 #endif

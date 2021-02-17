@@ -15,24 +15,24 @@
 
 void
 initialize_images(
-    const std::string imageFilename,
-    const std::string templateFilename,
-    cv::Mat* inputImage,
-    cv::Mat* equalGrayInputImage,
-    cv::Mat* equalTemplateImage
+    const std::string image_filename,
+    const std::string template_filename,
+    cv::Mat* input_image,
+    cv::Mat* equal_gray_input_image,
+    cv::Mat* equal_template_image
 ) {
     // open image as color
-    *inputImage = open_image(imageFilename.c_str(), false);
+    *input_image = open_image(image_filename.c_str(), false);
 
     // convert input image to grayscale
-    cv::cvtColor(*inputImage, *equalGrayInputImage, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(*input_image, *equal_gray_input_image, cv::COLOR_BGR2GRAY);
     // equalize grayscale input image
-    cv::equalizeHist(*equalGrayInputImage, *equalGrayInputImage);
+    cv::equalizeHist(*equal_gray_input_image, *equal_gray_input_image);
 
     // read template image as grayscale
-    *equalTemplateImage = open_image(templateFilename.c_str(), true);
+    *equal_template_image = open_image(template_filename.c_str(), true);
     // equalize template input image
-    cv::equalizeHist(*equalTemplateImage, *equalTemplateImage);
+    cv::equalizeHist(*equal_template_image, *equal_template_image);
 }
 
 
@@ -44,18 +44,18 @@ mouse_callback_pick_points(int event, int x, int y, int d, void* userdata)
     switch (event) {
         case cv::EVENT_LBUTTONUP:
             // limit amount of points
-            if (state->points.size() >= state->maxPoints) break;
+            if (state->points.size() >= state->max_points) break;
             // push the new point
             state->points.push_back(cv::Point(x, y));
             // draw a circle on a copy of the image
             cv::circle(
-                *(state->imageWithPoints),
+                *(state->image_with_points),
                 cv::Point(x, y), 5,
                 cv::Scalar(255),
                 cv::FILLED, cv::LINE_8
             );
             // show the copy of the image
-            cv::imshow(*(state->windowName), *(state->imageWithPoints));
+            cv::imshow(*(state->window_name), *(state->image_with_points));
             break;
     }
 }
@@ -63,9 +63,9 @@ mouse_callback_pick_points(int event, int x, int y, int d, void* userdata)
 
 // assign mouse callbacks
 ManualState
-initialize_callback(std::string* windowName, cv::Mat* image, int maxPoints)
+initialize_callback(std::string* window_name, cv::Mat* image, int max_points)
 {
-    ManualState manualState = { windowName, image, maxPoints };
-    cv::setMouseCallback( *windowName, mouse_callback_pick_points, &manualState );
-    return manualState;
+    ManualState manual_state = { window_name, image, max_points };
+    cv::setMouseCallback( *window_name, mouse_callback_pick_points, &manual_state );
+    return manual_state;
 }

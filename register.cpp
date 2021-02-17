@@ -39,78 +39,79 @@ int
 main(int argc, const char** argv)
 {
     // CLA variables
-    std::string imageFilename;
-    std::string templateFilename;
-    std::string warpFilename;
-    std::string outputWarp;
-    std::string warpImgFilename;
+    std::string image_filename;
+    std::string template_filename;
+    std::string warp_filename;
+    std::string output_warp;
+    std::string warp_img_filename;
     bool  manual;
     float epsilon;
-    int   motionType;
+    int   motion_type;
 
     // parse and save command line args
     int parse_result = parse_arguments(
         argc, argv,
-        &imageFilename,
-        &templateFilename,
-        &warpFilename,
+        &image_filename,
+        &template_filename,
+        &warp_filename,
         &manual,
         &epsilon,
-        &motionType,
-        &outputWarp,
-        &warpImgFilename
+        &motion_type,
+        &output_warp,
+        &warp_img_filename
     );
     if (parse_result != 1) return parse_result;
 
 
     // initialize images
-    cv::Mat inputImage;
-    cv::Mat equalGrayInputImage;
-    cv::Mat equalTemplateImage;
-    cv::Mat inputImageWithPoints;       // } only for
-    cv::Mat templateImageWithPoints;    // } manual registration
+    cv::Mat input_image;
+    cv::Mat equal_gray_input_image;
+    cv::Mat equal_template_image;
+    cv::Mat input_image_with_points;       // } only for
+    cv::Mat template_image_with_points;    // } manual registration
 
     initialize_images(
-        imageFilename,
-        templateFilename,
-        &inputImage,
-        &equalGrayInputImage,
-        &equalTemplateImage
+        image_filename,
+        template_filename,
+        &input_image,
+        &equal_gray_input_image,
+        &equal_template_image
     );
 
     // set max points for warp matrix
-    int max_points = motionType != cv::MOTION_HOMOGRAPHY ? 6 : 9;
+    int max_points = motion_type != cv::MOTION_HOMOGRAPHY ? 6 : 9;
 
     // begin image registration by displaying input
-    cv::imshow( WINDOW_NAME + " Input Image", inputImage );
+    cv::imshow( WINDOW_NAME + " Input Image", input_image );
     while (wait_key());
 
-    std::string equalGrayTitle = WINDOW_NAME + " Equalized Grayscale Image";
-    cv::imshow( equalGrayTitle, equalGrayInputImage  );
+    std::string equal_gray_title = WINDOW_NAME + " Equalized Grayscale Image";
+    cv::imshow( equal_gray_title, equal_gray_input_image  );
     if (manual) {
         // create manual state for input image
-        equalGrayInputImage.copyTo(inputImageWithPoints);
-        initialize_callback(&equalGrayTitle, &inputImageWithPoints, max_points);
+        equal_gray_input_image.copyTo(input_image_with_points);
+        initialize_callback(&equal_gray_title, &input_image_with_points, max_points);
     }
 
-    std::string equalTemplateTitle = WINDOW_NAME + " Template Image";
-    cv::imshow( equalTemplateTitle, equalTemplateImage );
+    std::string equal_template_title = WINDOW_NAME + " Template Image";
+    cv::imshow( equal_template_title, equal_template_image );
     if (manual) {
         // create manual state for template image
-        equalTemplateImage.copyTo(templateImageWithPoints);
-        initialize_callback(&equalTemplateTitle, &templateImageWithPoints, max_points);
+        equal_template_image.copyTo(template_image_with_points);
+        initialize_callback(&equal_template_title, &template_image_with_points, max_points);
     }
 
     // create warp matrix
+    cv::Mat warp_matrix = cv::Mat::eye(2, 3, CV_8UC1);
 
     // 'event loop' for keypresses
     while (wait_key());
 
-    inputImage.release();
-    equalGrayInputImage.release();
-    equalTemplateImage.release();
-    inputImageWithPoints.release();
-    templateImageWithPoints.release();
+    input_image.release();
+    equal_gray_input_image.release();
+    equal_template_image.release();
+    input_image_with_points.release();
+    template_image_with_points.release();
 
     return 0;
 }
