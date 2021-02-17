@@ -61,10 +61,9 @@ mouse_callback_pick_points(int event, int x, int y, int d, void* userdata)
 
 
 // assign mouse callbacks
-ManualState
-initialize_callback(std::string* window_name, cv::Mat* image, int max_points)
+void
+init_callback(ManualState* state, std::string* window_name, cv::Mat* image, int max_points)
 {
-    ManualState manual_state = { window_name, image, max_points };
-    cv::setMouseCallback( *window_name, mouse_callback_pick_points, &manual_state );
-    return manual_state;
+    *state = { window_name, image, max_points };
+    cv::setMouseCallback( *window_name, mouse_callback_pick_points, state );
 }

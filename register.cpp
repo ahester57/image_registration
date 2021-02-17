@@ -21,14 +21,21 @@ const std::string WINDOW_NAME = "Image Registration";
 int
 wait_key()
 {
-    char key_pressed = cv::waitKey(0) & 255;
-    if (cv::getWindowProperty(WINDOW_NAME, cv::WND_PROP_VISIBLE) < 1) {
-        // this ends the program if window is closed
-        return 0;
-    }
+    char key_pressed = cv::waitKey(66) & 255;
     // 'q' or  <escape> quits out
     if (key_pressed == 27 || key_pressed == 'q') {
         cv::destroyAllWindows();
+        return 0;
+    }
+    return 1;
+}
+
+
+int
+wait_key(ManualState state)
+{
+    if (!wait_key()) return 0;
+    if (state.points.size() == state.max_points) {
         return 0;
     }
     return 1;
@@ -67,8 +74,8 @@ main(int argc, const char** argv)
     cv::Mat input_image;
     cv::Mat equal_gray_input_image;
     cv::Mat equal_template_image;
-    cv::Mat input_image_with_points;       // } only for
-    cv::Mat template_image_with_points;    // } manual registration
+    cv::Mat input_image_copy;       // } only for
+    cv::Mat template_image_copy;    // } manual registration
 
     initialize_images(
         image_filename,
@@ -83,22 +90,34 @@ main(int argc, const char** argv)
 
     // begin image registration by displaying input
     cv::imshow( WINDOW_NAME + " Input Image", input_image );
-    while (wait_key());
+    wait_key(); // flash original until input
 
-    std::string equal_gray_title = WINDOW_NAME + " Equalized Grayscale Image";
+    // Template Image
+    std::string template_subtitle = " Template Image";
+    std::string template_title = WINDOW_NAME + template_subtitle;
+    cv::imshow( template_title, equal_template_image );
+
+    // Equalized, Grayscale Input Image
+    std::string equal_gray_subtitle = " Equalized Grayscale Image";
+    std::string equal_gray_title = WINDOW_NAME + equal_gray_subtitle;
     cv::imshow( equal_gray_title, equal_gray_input_image  );
+
     if (manual) {
         // create manual state for input image
-        equal_gray_input_image.copyTo(input_image_with_points);
-        initialize_callback(&equal_gray_title, &input_image_with_points, max_points);
-    }
+        ManualState input_state;
+        equal_gray_input_image.copyTo(input_image_copy);
+        init_callback(&input_state, &equal_gray_title, &input_image_copy, max_points);
+        // wait for them to pick all the points on the image.
+        std::cout << "Manual Mode: Please choose all points on " << equal_gray_subtitle << std::endl;
+        while (wait_key(input_state));
 
-    std::string equal_template_title = WINDOW_NAME + " Template Image";
-    cv::imshow( equal_template_title, equal_template_image );
-    if (manual) {
         // create manual state for template image
-        equal_template_image.copyTo(template_image_with_points);
-        initialize_callback(&equal_template_title, &template_image_with_points, max_points);
+        ManualState template_state;
+        equal_template_image.copyTo(template_image_copy);
+        init_callback(&template_state, &template_title, &template_image_copy, max_points);
+        // wait for them to pick all the points on the image.
+        std::cout << "Manual Mode: Please choose all points on " << template_subtitle << std::endl;
+        while (wait_key(template_state));
     }
 
     // create warp matrix
@@ -110,8 +129,8 @@ main(int argc, const char** argv)
     input_image.release();
     equal_gray_input_image.release();
     equal_template_image.release();
-    input_image_with_points.release();
-    template_image_with_points.release();
+    input_image_copy.release();
+    template_image_copy.release();
 
     return 0;
 }
