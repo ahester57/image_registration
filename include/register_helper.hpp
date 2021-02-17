@@ -12,7 +12,7 @@
 
 struct ManualState {
     std::string* window_name;
-    cv::Mat* image_with_points;
+    cv::Mat* image;
     int max_points;
     std::vector<cv::Point> points;
 };

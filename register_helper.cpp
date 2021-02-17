@@ -47,15 +47,14 @@ mouse_callback_pick_points(int event, int x, int y, int d, void* userdata)
             if (state->points.size() >= state->max_points) break;
             // push the new point
             state->points.push_back(cv::Point(x, y));
-            // draw a circle on a copy of the image
-            cv::circle(
-                *(state->image_with_points),
-                cv::Point(x, y), 5,
-                cv::Scalar(255),
-                cv::FILLED, cv::LINE_8
-            );
+            // draw a circle mask at chosen points
+            cv::Mat circle_mask = cv::Mat::zeros(state->image->size(), CV_8UC1);
+            cv::circle(circle_mask, cv::Point(x, y), 5, cv::Scalar(255), cv::FILLED);
+            // make circle more contrasty by inverting and drawing black border
+            cv::bitwise_not(*(state->image), *(state->image), circle_mask);
+            cv::circle(*(state->image), cv::Point(x, y), 5, cv::Scalar(0));
             // show the copy of the image
-            cv::imshow(*(state->window_name), *(state->image_with_points));
+            cv::imshow(*(state->window_name), *(state->image));
             break;
     }
 }
