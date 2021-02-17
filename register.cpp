@@ -1,5 +1,5 @@
 // register.cpp : This file contains the 'main' function. Program execution begins and ends there.
-// Austin Hester CS542o dec 2020
+// Austin Hester CS642o feb 2021
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
 #include <opencv2/core/core.hpp>
@@ -11,19 +11,11 @@
 #include <vector>
 
 #include "./include/cla_parse.hpp"
-#include "./include/dir_func.hpp"
+#include "./include/register_helper.hpp"
 
 
 const std::string WINDOW_NAME = "Image Registration";
 
-
-struct ManualState {
-    std::string* windowName;
-    cv::Mat* image;
-    cv::Mat* imageWithPoints;
-    std::vector<cv::Point> points;
-    int maxPoints;
-};
 
 // 'event loop' for keypresses
 int
@@ -43,56 +35,6 @@ wait_key()
 }
 
 
-void
-initialize_images(
-    const std::string imageFilename,
-    const std::string templateFilename,
-    cv::Mat* inputImage,
-    cv::Mat* equalGrayInputImage,
-    cv::Mat* equalTemplateImage
-) {
-    // open image as color
-    *inputImage = open_image(imageFilename.c_str(), false);
-
-    // convert input image to grayscale
-    cv::cvtColor(*inputImage, *equalGrayInputImage, cv::COLOR_BGR2GRAY);
-    // equalize grayscale input image
-    cv::equalizeHist(*equalGrayInputImage, *equalGrayInputImage);
-
-    // read template image as grayscale
-    *equalTemplateImage = open_image(templateFilename.c_str(), true);
-    // equalize template input image
-    cv::equalizeHist(*equalTemplateImage, *equalTemplateImage);
-}
-
-
-void
-mouse_callback(int event, int x, int y, int d, void* userdata)
-{
-    ManualState* state = (ManualState*) userdata;
-
-    switch (event) {
-        case cv::EVENT_LBUTTONUP:
-            if (state->points.size() >= state->maxPoints) break;
-            state->points.push_back(cv::Point(x, y));
-            // std::cout << "-----" << std::endl;
-            // for (auto p : state->points) {
-            //     std::cout << p << "\t";
-            // }
-            // std::cout << std::endl;
-            // draw a circle on the image to show where they've clicked
-            cv::circle(
-                *(state->imageWithPoints),
-                cv::Point(x, y), 5,
-                cv::Scalar(255),
-                cv::FILLED, cv::LINE_8
-            );
-            cv::imshow(*(state->windowName), *(state->imageWithPoints));
-            break;
-    }
-}
-
-
 int
 main(int argc, const char** argv)
 {
@@ -100,11 +42,11 @@ main(int argc, const char** argv)
     std::string imageFilename;
     std::string templateFilename;
     std::string warpFilename;
-    bool manual;
-    float epsilon;
-    int motionType;
     std::string outputWarp;
     std::string warpImgFilename;
+    bool  manual;
+    float epsilon;
+    int   motionType;
 
     // parse and save command line args
     int parse_result = parse_arguments(
@@ -120,10 +62,13 @@ main(int argc, const char** argv)
     );
     if (parse_result != 1) return parse_result;
 
+
     // initialize images
     cv::Mat inputImage;
     cv::Mat equalGrayInputImage;
     cv::Mat equalTemplateImage;
+    cv::Mat inputImageWithPoints;       // } only for
+    cv::Mat templateImageWithPoints;    // } manual registration
 
     initialize_images(
         imageFilename,
@@ -133,32 +78,30 @@ main(int argc, const char** argv)
         &equalTemplateImage
     );
 
-    std::cout << "\nShortcuts:\n\tq\t- quit\n";
+    // set max points for warp matrix
+    int max_points = motionType != cv::MOTION_HOMOGRAPHY ? 6 : 9;
 
-    // image registration
-    cv::imshow(WINDOW_NAME + " Input Image", inputImage);    while (wait_key());
+    // begin image registration by displaying input
+    cv::imshow( WINDOW_NAME + " Input Image", inputImage );
+    while (wait_key());
 
     std::string equalGrayTitle = WINDOW_NAME + " Equalized Grayscale Image";
-    cv::imshow(equalGrayTitle, equalGrayInputImage);
+    cv::imshow( equalGrayTitle, equalGrayInputImage  );
+    if (manual) {
+        // create manual state for input image
+        equalGrayInputImage.copyTo(inputImageWithPoints);
+        initialize_callback(&equalGrayTitle, &inputImageWithPoints, max_points);
+    }
 
     std::string equalTemplateTitle = WINDOW_NAME + " Template Image";
-    cv::imshow(equalTemplateTitle, equalTemplateImage);
-
-    cv::Mat inputImageWithPoints;
-    cv::Mat templateImageWithPoints;
-
+    cv::imshow( equalTemplateTitle, equalTemplateImage );
     if (manual) {
-        ManualState inputState = { &equalGrayTitle, &equalGrayInputImage, &inputImageWithPoints };
-        equalGrayInputImage.copyTo(inputImageWithPoints);
-        inputState.maxPoints = motionType == cv::MOTION_HOMOGRAPHY ? 9 : 6;
-
-        ManualState templateState = { &equalTemplateTitle, &equalTemplateImage, &templateImageWithPoints };
+        // create manual state for template image
         equalTemplateImage.copyTo(templateImageWithPoints);
-        templateState.maxPoints = motionType == cv::MOTION_HOMOGRAPHY ? 9 : 6;
-
-        cv::setMouseCallback(equalGrayTitle, mouse_callback, &inputState);
-        cv::setMouseCallback(equalTemplateTitle, mouse_callback, &templateState);
+        initialize_callback(&equalTemplateTitle, &templateImageWithPoints, max_points);
     }
+
+    // create warp matrix
 
     // 'event loop' for keypresses
     while (wait_key());

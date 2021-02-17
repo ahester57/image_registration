@@ -113,5 +113,7 @@ parse_arguments(
         return -1;
     }
 
+    std::cout << std::endl << "Shortcuts:" << std::endl << "\tq\t- quit" << std::endl << std::endl;
+
     return 1;
 }
