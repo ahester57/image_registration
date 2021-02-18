@@ -71,6 +71,7 @@ parse_arguments(
 
     try {
         *manual = (bool) parser.has("M");
+        assert((warp_filename->size() > 0) != *manual);
     } catch (...) {
         std::cerr << "Failed to parse manual argument." << std::endl;
         return -1;
@@ -78,6 +79,7 @@ parse_arguments(
 
     try {
         *epsilon = parser.get<float>("e");
+        assert(*epsilon > 0 && *epsilon <= 0.1);
     } catch (...) {
         std::cerr << "Failed to parse epsilon argument!:" << std::endl;
         return -1;
@@ -112,6 +114,7 @@ parse_arguments(
         std::cerr << "Failed to parse warp_img_filename argument!:" << std::endl;
         return -1;
     }
+
 
     std::cout << std::endl << "Shortcuts:" << std::endl << "\tq\t- quit" << std::endl << std::endl;
 

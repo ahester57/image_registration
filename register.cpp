@@ -21,10 +21,9 @@ const std::string WINDOW_NAME = "Image Registration";
 int
 wait_key()
 {
-    char key_pressed = cv::waitKey(66) & 255;
+    char key_pressed = cv::waitKey(0) & 255;
     // 'q' or  <escape> quits out
     if (key_pressed == 27 || key_pressed == 'q') {
-        cv::destroyAllWindows();
         return 0;
     }
     return 1;
@@ -32,13 +31,10 @@ wait_key()
 
 
 int
-wait_key(ManualState state)
+wait_state_full(ManualState state)
 {
-    if (!wait_key()) return 0;
-    if (state.points.size() == state.max_points) {
-        return 0;
-    }
-    return 1;
+    char key_pressed = cv::waitKey(66) & 255;
+    return !(state.points.size() >= state.max_points);
 }
 
 
@@ -102,6 +98,9 @@ main(int argc, const char** argv)
     std::string equal_gray_title = WINDOW_NAME + equal_gray_subtitle;
     cv::imshow( equal_gray_title, equal_gray_input_image  );
 
+    // create warp matrix
+    cv::Mat warp_matrix = cv::Mat::eye(motion_type != cv::MOTION_HOMOGRAPHY ? 2 : 3, 3, CV_8UC1);
+
     if (manual) {
         // create manual state for input image
         ManualState input_state;
@@ -109,7 +108,7 @@ main(int argc, const char** argv)
         init_callback(&input_state, &equal_gray_title, &input_image_copy, max_points);
         // wait for them to pick all the points on the image.
         std::cout << "Manual Mode: Please choose all points on " << equal_gray_subtitle << std::endl;
-        while (wait_key(input_state));
+        while (wait_state_full(input_state));
 
         // create manual state for template image
         ManualState template_state;
@@ -117,15 +116,21 @@ main(int argc, const char** argv)
         init_callback(&template_state, &template_title, &template_image_copy, max_points);
         // wait for them to pick all the points on the image.
         std::cout << "Manual Mode: Please choose all points on " << template_subtitle << std::endl;
-        while (wait_key(template_state));
+        while (wait_state_full(template_state));
+        // use points to initialize warp matrix
     }
 
-    // create warp matrix
-    cv::Mat warp_matrix = cv::Mat::eye(2, 3, CV_8UC1);
+    // if (warp_filename.size() > 0) {
+    //     // TODO warp matrix read in file
+    // }
+
+    // compute warp matrix
+
 
     // 'event loop' for keypresses
     while (wait_key());
 
+    cv::destroyAllWindows();
     input_image.release();
     equal_gray_input_image.release();
     equal_template_image.release();
