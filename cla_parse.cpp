@@ -72,7 +72,7 @@ parse_arguments(
 
     try {
         *manual = (bool) parser.has("M");
-        assert((warp_filename->size() > 0) != *manual);
+        assert((warp_filename->size() > 0) != *manual || ((warp_filename->size() == 0) && !*manual));
     } catch (...) {
         std::cerr << "Failed to parse manual argument." << std::endl;
         return -1;
