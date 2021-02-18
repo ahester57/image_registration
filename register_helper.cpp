@@ -48,7 +48,7 @@ mouse_callback_pick_points(int event, int x, int y, int d, void* userdata)
             // limit amount of points
             if (state->points.size() >= state->max_points) break;
             // push the new point
-            state->points.push_back(cv::Point(x, y));
+            state->points.push_back(cv::Point2f(x, y));
             // draw a circle mask at chosen points
             cv::Mat circle_mask = cv::Mat::zeros(state->image->size(), CV_8UC1);
             cv::circle(circle_mask, cv::Point(x, y), 5, cv::Scalar(255), cv::FILLED);
@@ -112,13 +112,7 @@ print_results(std::string motion_type, double correlation_co)
 
 
 void
-create_manual_warp_matrix(ManualState state_1, ManualState state_2, cv::Mat* warp_matrix)
+create_affine_warp_matrix(ManualState state_1, ManualState state_2, cv::Mat* warp_matrix)
 {
-    int matrix_width = warp_matrix->size().width;
-    int n_pixels = state_1.image->size().area();
-    for (int i = 0; i < warp_matrix->size().area(); i++) {
-        float dot_product = (float) state_1.points.at(i).ddot(state_2.points.at(i));
-        warp_matrix->at<float>(i /  matrix_width, i %  matrix_width)
-            = dot_product / n_pixels;
-    }
+    cv::getAffineTransform(&state_1.points[0], &state_2.points[0]).convertTo(*warp_matrix, CV_32F);
 }

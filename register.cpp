@@ -135,7 +135,9 @@ main(int argc, const char** argv)
         wait_state_full( &template_state );
 
         // use homogeneous points to initialize warp matrix
-        create_manual_warp_matrix( input_state, template_state, &warp_matrix );
+        motion_type != cv::MOTION_HOMOGRAPHY ?
+            create_affine_warp_matrix( input_state, template_state, &warp_matrix ) :
+            (void)printf("Homography manual TODO\n");
 
         input_image_copy.release();
         template_image_copy.release();
@@ -150,16 +152,16 @@ main(int argc, const char** argv)
     // findTransformECC returns the final enhanced correlation coefficient,
     // that is the correlation coefficient between the template image and the final warped input image.
     double correlation_co
-    = cv::findTransformECC(
-        equal_template_image,
-        equal_gray_input_image,
-        warp_matrix,
-        motion_type,
-        cv::TermCriteria(
-            cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
-            warp_matrix.size().area(),
-            epsilon)
-    );
+        = cv::findTransformECC(
+            equal_template_image,
+            equal_gray_input_image,
+            warp_matrix,
+            motion_type,
+            cv::TermCriteria(
+                cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
+                warp_matrix.size().area(),
+                epsilon)
+        );
 
     print_warp_matrix(warp_matrix);
     print_results(motion_type_string, correlation_co);
