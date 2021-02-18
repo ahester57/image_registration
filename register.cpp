@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "./include/cla_parse.hpp"
+#include "./include/dir_func.hpp"
 #include "./include/register_helper.hpp"
 
 #define DEBUG 1
@@ -172,6 +173,7 @@ main(int argc, const char** argv)
         cv::warpPerspective(input_image, input_image_copy, warp_matrix, input_image.size());
 
     cv::imshow( WINDOW_NAME + " Warped", input_image_copy  );
+    write_img_to_file(input_image_copy, "./out", warp_img_filename);
 
     // 'event loop' for keypresses
     wait_key();
