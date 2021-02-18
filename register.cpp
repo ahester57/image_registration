@@ -30,11 +30,18 @@ wait_key()
 }
 
 
-int
-wait_state_full(ManualState state)
+// wait until the number of points in state
+// reaches the maximum allowed
+void
+wait_state_full(ManualState* state)
 {
-    char key_pressed = cv::waitKey(66) & 255;
-    return !(state.points.size() >= state.max_points);
+    while (1) {
+        char key_pressed = cv::waitKey(66) & 255;
+        if (state->points.size() >= state->max_points) {
+            return;
+        }
+    }
+    return;
 }
 
 
@@ -110,7 +117,7 @@ main(int argc, const char** argv)
         init_callback(&input_state, &equal_gray_title, &input_image_copy, max_points);
         // wait for them to pick all the points on the image.
         std::cout << "Manual Mode: Please choose all points on " << equal_gray_subtitle << std::endl;
-        while (wait_state_full(input_state));
+        wait_state_full( &input_state );
 
         // create manual state for template image
         ManualState template_state;
@@ -118,7 +125,7 @@ main(int argc, const char** argv)
         init_callback(&template_state, &template_title, &template_image_copy, max_points);
         // wait for them to pick all the points on the image.
         std::cout << "Manual Mode: Please choose all points on " << template_subtitle << std::endl;
-        while (wait_state_full(template_state));
+        wait_state_full( &template_state );
         // use points to initialize warp matrix
     }
 
