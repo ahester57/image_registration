@@ -54,6 +54,7 @@ main(int argc, const char** argv)
     std::string warp_filename;
     std::string output_warp;
     std::string warp_img_filename;
+    std::string motion_type_string;
     bool   manual;
     double epsilon;
     int    motion_type;
@@ -66,12 +67,13 @@ main(int argc, const char** argv)
         &warp_filename,
         &manual,
         &epsilon,
-        &motion_type,
+        &motion_type_string,
         &output_warp,
         &warp_img_filename
     );
     if (parse_result != 1) return parse_result;
 
+    motion_type = motion_type_string_to_int(motion_type_string);
 
     // initialize images
     cv::Mat input_image;
@@ -137,6 +139,7 @@ main(int argc, const char** argv)
         // if warp_matrix, hasn't been set yet, use identity matrix
         warp_matrix = cv::Mat::eye(warp_matrix_size, CV_32F);
     }
+
     // findTransformECC returns the final enhanced correlation coefficient,
     // that is the correlation coefficient between the template image and the final warped input image.
     double correlation_co
@@ -145,10 +148,14 @@ main(int argc, const char** argv)
         equal_gray_input_image,
         warp_matrix,
         motion_type,
-        cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, warp_matrix.size().area(), epsilon)
+        cv::TermCriteria(
+            cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
+            warp_matrix.size().area(),
+            epsilon)
     );
 
-    std::cout << correlation_co;
+    print_results(motion_type_string, correlation_co, warp_matrix);
+
     // 'event loop' for keypresses
     while (wait_key());
 

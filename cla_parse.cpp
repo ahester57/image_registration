@@ -3,9 +3,6 @@
 // g++.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/video/tracking.hpp>
-
-#include <map>
 
 #include "./include/cla_parse.hpp"
 
@@ -20,7 +17,7 @@ parse_arguments(
     std::string* warp_filename,
     bool*        manual,
     double*      epsilon,
-    int*         motion_type,
+    std::string* motion_type,
     std::string* output_warp,
     std::string* warp_img_filename
 ) {
@@ -87,16 +84,7 @@ parse_arguments(
     }
 
     try {
-        std::map<std::string, int> motion_type_map = {
-            { "translation", cv::MOTION_TRANSLATION },
-            { "euclidean"  , cv::MOTION_EUCLIDEAN   },
-            { "affine"     , cv::MOTION_AFFINE      },
-            { "homography" , cv::MOTION_HOMOGRAPHY  }
-        };
-        std::string motion_type_string = parser.get<std::string>("m");
-        *motion_type = motion_type_map[motion_type_string];
-        // assertion to prevent them from typing wrong and getting translation
-        assert(motion_type_string != "translation" ? *motion_type != 0 : true);
+        *motion_type = parser.get<std::string>("m").c_str();
     } catch (...) {
         std::cerr << "Failed to parse motion_type argument!:" << std::endl;
         return -1;
