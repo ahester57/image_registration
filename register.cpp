@@ -13,12 +13,13 @@
 #include "./include/cla_parse.hpp"
 #include "./include/register_helper.hpp"
 
-#define DEBUG 0
+#define DEBUG 1
 
 const std::string WINDOW_NAME = "Image Registration";
 
 
 // 'event loop' for keypresses
+// call in a while loop to only register q or <esc>
 int
 wait_key()
 {
@@ -79,6 +80,7 @@ main(int argc, const char** argv)
     // initialize images
     cv::Mat input_image;
     cv::Mat equal_gray_input_image;
+    cv::Mat template_image;
     cv::Mat equal_template_image;
     cv::Mat input_image_copy;       // } only for
     cv::Mat template_image_copy;    // } manual registration
@@ -88,6 +90,7 @@ main(int argc, const char** argv)
         template_filename,
         &input_image,
         &equal_gray_input_image,
+        &template_image,
         &equal_template_image
     );
 
@@ -108,10 +111,10 @@ main(int argc, const char** argv)
     std::string equal_gray_title = WINDOW_NAME + equal_gray_subtitle;
     cv::imshow( equal_gray_title, equal_gray_input_image  );
 
-    // create warp matrix
-    cv::Mat warp_matrix;
     // i hate size for being opposite
     cv::Size warp_matrix_size = cv::Size(3, motion_type != cv::MOTION_HOMOGRAPHY ? 2 : 3);
+    // create warp matrix
+    cv::Mat warp_matrix = cv::Mat::eye(warp_matrix_size, CV_32F);;
 
     // set warp matrix manually
     if (manual) {
@@ -131,21 +134,14 @@ main(int argc, const char** argv)
         std::cout << "Manual Mode: Please choose all points on " << template_subtitle << std::endl;
         wait_state_full( &template_state );
 
-        // use points to initialize warp matrix
-        warp_matrix = cv::Mat::zeros(warp_matrix_size, CV_32F);
+        // use homogeneous points to initialize warp matrix
         create_manual_warp_matrix( input_state, template_state, &warp_matrix );
-
 
         input_image_copy.release();
         template_image_copy.release();
 
     } else if (warp_filename.size() > 0) {
         // TODO warp matrix read in file
-    }
-
-    // if warp_matrix, hasn't been set yet, use identity matrix
-    if (warp_matrix.size().area() == 0) {
-        warp_matrix = cv::Mat::eye(warp_matrix_size, CV_32F);
     }
 
     // display input warp matrix
@@ -169,12 +165,20 @@ main(int argc, const char** argv)
     print_results(motion_type_string, correlation_co);
 
     // warp original image using transformed warp matrix
-    std::string warped_title = WINDOW_NAME + " Warped";
     motion_type != cv::MOTION_HOMOGRAPHY ?
         cv::warpAffine(input_image, input_image_copy, warp_matrix, input_image.size()) :
         cv::warpPerspective(input_image, input_image_copy, warp_matrix, input_image.size());
 
-    cv::imshow( warped_title, input_image_copy  );
+    cv::imshow( WINDOW_NAME + " Warped", input_image_copy  );
+
+    // 'event loop' for keypresses
+    wait_key();
+
+    // compute and show error
+    cv::Mat gray_warped;
+    cv::cvtColor(input_image_copy, gray_warped, cv::COLOR_BGR2GRAY);
+    cv::Mat error = template_image - gray_warped;
+    cv::imshow( WINDOW_NAME + " Error", error  );
 
     // 'event loop' for keypresses
     while (wait_key());

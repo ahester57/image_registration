@@ -23,6 +23,7 @@ initialize_images(
     const std::string template_filename,
     cv::Mat* input_image,
     cv::Mat* equal_gray_input_image,
+    cv::Mat* template_image,
     cv::Mat* equal_template_image
 );
 

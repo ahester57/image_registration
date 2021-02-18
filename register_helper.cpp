@@ -20,6 +20,7 @@ initialize_images(
     const std::string template_filename,
     cv::Mat* input_image,
     cv::Mat* equal_gray_input_image,
+    cv::Mat* template_image,
     cv::Mat* equal_template_image
 ) {
     // open image as color
@@ -31,9 +32,9 @@ initialize_images(
     cv::equalizeHist(*equal_gray_input_image, *equal_gray_input_image);
 
     // read template image as grayscale
-    *equal_template_image = open_image(template_filename.c_str(), true);
+    *template_image = open_image(template_filename.c_str(), true);
     // equalize template input image
-    cv::equalizeHist(*equal_template_image, *equal_template_image);
+    cv::equalizeHist(*template_image, *equal_template_image);
 }
 
 
@@ -90,7 +91,7 @@ void
 print_warp_matrix(cv::Mat warp_matrix, bool original)
 {
     std::cout << std::endl
-            << (original ? "Original " : "Transformed")
+            << (original ? "Original " : "Transformed ")
             << "Warp Matrix: " << std::endl;
     for (int i = 0; i < warp_matrix.size().height; i++) {
         std::cout << "[";
