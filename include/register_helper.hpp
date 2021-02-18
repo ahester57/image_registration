@@ -30,5 +30,6 @@ void mouse_callback_pick_points(int event, int x, int y, int d, void* userdata);
 void init_callback(ManualState* state, std::string* window_name, cv::Mat* image, int max_points);
 int motion_type_string_to_int(std::string motion_type_string);
 void print_results(std::string motion_type, double correlation_co, cv::Mat warp_matrix);
+void create_manual_warp_matrix(ManualState state_1, ManualState state_2, cv::Mat* warp_matrix);
 
 #endif

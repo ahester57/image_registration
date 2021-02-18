@@ -13,6 +13,7 @@
 #include "./include/cla_parse.hpp"
 #include "./include/register_helper.hpp"
 
+#define DEBUG 0
 
 const std::string WINDOW_NAME = "Image Registration";
 
@@ -112,11 +113,12 @@ main(int argc, const char** argv)
     // i hate size for being opposite
     cv::Size warp_matrix_size = cv::Size(3, motion_type != cv::MOTION_HOMOGRAPHY ? 2 : 3);
 
+    // set warp matrix manually
     if (manual) {
         // create manual state for input image
         ManualState input_state;
         equal_gray_input_image.copyTo(input_image_copy);
-        init_callback(&input_state, &equal_gray_title, &input_image_copy, max_points);
+        init_callback( &input_state, &equal_gray_title, &input_image_copy, max_points );
         // wait for them to pick all the points on the image.
         std::cout << "Manual Mode: Please choose all points on " << equal_gray_subtitle << std::endl;
         wait_state_full( &input_state );
@@ -124,21 +126,29 @@ main(int argc, const char** argv)
         // create manual state for template image
         ManualState template_state;
         equal_template_image.copyTo(template_image_copy);
-        init_callback(&template_state, &template_title, &template_image_copy, max_points);
+        init_callback( &template_state, &template_title, &template_image_copy, max_points );
         // wait for them to pick all the points on the image.
         std::cout << "Manual Mode: Please choose all points on " << template_subtitle << std::endl;
         wait_state_full( &template_state );
+
         // use points to initialize warp matrix
+        warp_matrix = cv::Mat::zeros(warp_matrix_size, CV_32F);
+        create_manual_warp_matrix( input_state, template_state, &warp_matrix );
+#if DEBUG
+        print_results(motion_type_string, 1.0, warp_matrix);
+#endif
+        input_image_copy.release();
+        template_image_copy.release();
+
+    } else if (warp_filename.size() > 0) {
+        // TODO warp matrix read in file
     }
 
-    // } elif (warp_filename.size() > 0) {
-    //     // TODO warp matrix read in file
-    // }
-
+    // if warp_matrix, hasn't been set yet, use identity matrix
     if (warp_matrix.size().area() == 0) {
-        // if warp_matrix, hasn't been set yet, use identity matrix
         warp_matrix = cv::Mat::eye(warp_matrix_size, CV_32F);
     }
+
 
     // findTransformECC returns the final enhanced correlation coefficient,
     // that is the correlation coefficient between the template image and the final warped input image.

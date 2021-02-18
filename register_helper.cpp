@@ -103,3 +103,16 @@ print_results(std::string motion_type, double correlation_co, cv::Mat warp_matri
         std::cout << warp_matrix.at<float>(i, warp_matrix.size().width-1) << "]" << std::endl;
     }
 }
+
+
+void
+create_manual_warp_matrix(ManualState state_1, ManualState state_2, cv::Mat* warp_matrix)
+{
+    int matrix_width = warp_matrix->size().width;
+    int n_pixels = state_1.image->size().area();
+    for (int i = 0; i < warp_matrix->size().area(); i++) {
+        float dot_product = (float) state_1.points.at(i).ddot(state_2.points.at(i));
+        warp_matrix->at<float>(i /  matrix_width, i %  matrix_width)
+            = dot_product / n_pixels;
+    }
+}
