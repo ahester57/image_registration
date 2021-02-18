@@ -168,6 +168,14 @@ main(int argc, const char** argv)
     print_warp_matrix(warp_matrix);
     print_results(motion_type_string, correlation_co);
 
+    // warp original image using transformed warp matrix
+    std::string warped_title = WINDOW_NAME + " Warped";
+    motion_type != cv::MOTION_HOMOGRAPHY ?
+        cv::warpAffine(input_image, input_image_copy, warp_matrix, input_image.size()) :
+        cv::warpPerspective(input_image, input_image_copy, warp_matrix, input_image.size());
+
+    cv::imshow( warped_title, input_image_copy  );
+
     // 'event loop' for keypresses
     while (wait_key());
 
