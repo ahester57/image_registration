@@ -134,9 +134,8 @@ main(int argc, const char** argv)
         // use points to initialize warp matrix
         warp_matrix = cv::Mat::zeros(warp_matrix_size, CV_32F);
         create_manual_warp_matrix( input_state, template_state, &warp_matrix );
-#if DEBUG
-        print_results(motion_type_string, 1.0, warp_matrix);
-#endif
+
+
         input_image_copy.release();
         template_image_copy.release();
 
@@ -149,6 +148,8 @@ main(int argc, const char** argv)
         warp_matrix = cv::Mat::eye(warp_matrix_size, CV_32F);
     }
 
+    // display input warp matrix
+    print_warp_matrix(warp_matrix, true);
 
     // findTransformECC returns the final enhanced correlation coefficient,
     // that is the correlation coefficient between the template image and the final warped input image.
@@ -164,7 +165,8 @@ main(int argc, const char** argv)
             epsilon)
     );
 
-    print_results(motion_type_string, correlation_co, warp_matrix);
+    print_warp_matrix(warp_matrix);
+    print_results(motion_type_string, correlation_co);
 
     // 'event loop' for keypresses
     while (wait_key());

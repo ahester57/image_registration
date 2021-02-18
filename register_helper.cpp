@@ -87,14 +87,11 @@ motion_type_string_to_int(std::string motion_type_string)
 
 
 void
-print_results(std::string motion_type, double correlation_co, cv::Mat warp_matrix)
+print_warp_matrix(cv::Mat warp_matrix, bool original)
 {
-    std::cout << std::endl << "Motion Type: " << motion_type << std::endl;
-
-    std::cout << std::endl << "Correlation Coefficient: " << correlation_co << std::endl;
-
-    std::cout << std::endl << "Warp Matrix: " << std::endl;
-
+    std::cout << std::endl
+            << (original ? "Original " : "Transformed")
+            << "Warp Matrix: " << std::endl;
     for (int i = 0; i < warp_matrix.size().height; i++) {
         std::cout << "[";
         for (int j = 0; j < warp_matrix.size().width-1; j++) {
@@ -102,6 +99,14 @@ print_results(std::string motion_type, double correlation_co, cv::Mat warp_matri
         }
         std::cout << warp_matrix.at<float>(i, warp_matrix.size().width-1) << "]" << std::endl;
     }
+}
+
+
+void
+print_results(std::string motion_type, double correlation_co)
+{
+    std::cout << std::endl << "Motion Type: " << motion_type << std::endl;
+    std::cout << std::endl << "Correlation Coefficient: " << correlation_co << std::endl;
 }
 
 
