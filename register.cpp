@@ -138,8 +138,9 @@ main(int argc, const char** argv)
         equal_gray_input_image,
         warp_matrix,
         motion_type,
-        cv::TermCriteria(1, 1, epsilon)
+        cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, warp_matrix.size().area(), epsilon)
     );
+
     std::cout << correlation_co;
     // 'event loop' for keypresses
     while (wait_key());
