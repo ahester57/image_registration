@@ -137,7 +137,7 @@ main(int argc, const char** argv)
         // use homogeneous points to initialize warp matrix
         motion_type != cv::MOTION_HOMOGRAPHY ?
             create_affine_warp_matrix( input_state, template_state, &warp_matrix ) :
-            (void)printf("Homography manual TODO\n");
+            create_homography_warp_matrix( input_state, template_state, &warp_matrix );
 
         input_image_copy.release();
         template_image_copy.release();

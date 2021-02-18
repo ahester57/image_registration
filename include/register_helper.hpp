@@ -33,5 +33,6 @@ int motion_type_string_to_int(std::string motion_type_string);
 void print_warp_matrix(cv::Mat warp_matrix, bool original = false);
 void print_results(std::string motion_type, double correlation_co);
 void create_affine_warp_matrix(ManualState state_1, ManualState state_2, cv::Mat* warp_matrix);
+void create_homography_warp_matrix(ManualState state_1, ManualState state_2, cv::Mat* warp_matrix);
 
 #endif

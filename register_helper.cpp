@@ -114,5 +114,13 @@ print_results(std::string motion_type, double correlation_co)
 void
 create_affine_warp_matrix(ManualState state_1, ManualState state_2, cv::Mat* warp_matrix)
 {
+    // & <vector> [0] converts vector to primitive array
     cv::getAffineTransform(&state_1.points[0], &state_2.points[0]).convertTo(*warp_matrix, CV_32F);
+}
+
+void
+create_homography_warp_matrix(ManualState state_1, ManualState state_2, cv::Mat* warp_matrix)
+{
+    // & <vector> [0] converts vector to primitive array
+    cv::getPerspectiveTransform(&state_1.points[0], &state_2.points[0]).convertTo(*warp_matrix, CV_32F);
 }
