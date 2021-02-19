@@ -36,6 +36,34 @@ open_image(std::string file_path, bool grayscale)
     return dst;
 }
 
+
+void
+open_image_from_text(std::string file_path, cv::Mat* dst)
+{
+    try {
+
+
+        std::ifstream ifi;
+        ifi.open(file_path);
+        for (int i = 0; i < dst->size().height; i++) {
+            for (int j = 0; j < dst->size().width; j++) {
+                ifi >> dst->at<float>(i, j);
+            }
+        }
+        ifi.close();
+
+        cv::waitKey(100);
+
+    } catch (std::string &str) {
+        std::cerr << "Error: " << str << std::endl;
+    } catch (cv::Exception &e) {
+        std::cerr << "Error: " << e.msg << std::endl;
+    } catch (std::runtime_error &re) {
+        std::cerr << "Error: " << re.what() << std::endl;
+    }
+}
+
+
 int
 create_dir_recursive(std::string dst_file)
 {

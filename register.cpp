@@ -145,6 +145,7 @@ main(int argc, const char** argv)
 
     } else if (warp_filename.size() > 0) {
         // TODO warp matrix read in file
+        open_image_from_text(warp_filename, &warp_matrix);
     }
 
     // display input warp matrix
