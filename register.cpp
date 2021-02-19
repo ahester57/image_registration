@@ -183,11 +183,23 @@ main(int argc, const char** argv)
     // 'event loop' for keypresses
     wait_key();
 
-    // compute and show error
+    // get grayscale of input image
     cv::Mat gray_warped;
     cv::cvtColor(input_image_copy, gray_warped, cv::COLOR_BGR2GRAY);
+
+    // compute and show error
     cv::Mat error = template_image - gray_warped;
-    cv::imshow( WINDOW_NAME + " Error", error  );
+
+    double minVal;
+    double maxVal;
+    cv::Point minPoint;
+    cv::Point maxPoint;
+    // get max error
+    cv::minMaxLoc(error, &minVal, &maxVal, &minPoint, &maxPoint);
+    // scale error image
+    cv::Mat scaled_error = cv::abs(error) * (255/maxVal);
+    // and finally show it
+    cv::imshow( WINDOW_NAME + " Error", scaled_error );
 
     // 'event loop' for keypresses
     while (wait_key());
