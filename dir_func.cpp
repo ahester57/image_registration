@@ -7,6 +7,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/utils/filesystem.hpp>
 
+#include <fstream>
+
 #include "./include/dir_func.hpp"
 #include "./include/string_helper.hpp"
 
@@ -61,8 +63,40 @@ write_img_to_file(cv::Mat image, std::string output_dir, std::string file_name)
         std::string dst_file = output_dir + "/" + file_name;
         assert(create_dir_recursive(dst_file));
 
-        std::cout << "Writing " << dst_file << std::endl;
         assert(cv::imwrite(dst_file, image));
+
+        cv::waitKey(100);
+        std::cout << "Wrote " << dst_file << std::endl;
+
+    } catch (std::string &str) {
+        std::cerr << "Error: " << str << std::endl;
+        return -1;
+    } catch (cv::Exception &e) {
+        std::cerr << "Error: " << e.msg << std::endl;
+        return -1;
+    } catch (std::runtime_error &re) {
+        std::cerr << "Error: " << re.what() << std::endl;
+    }
+    return 1;
+}
+
+int
+write_img_to_file_as_text(cv::Mat image, std::string output_dir, std::string file_name)
+{
+    try {
+
+        std::string dst_file = output_dir + "/" + file_name;
+        assert(create_dir_recursive(dst_file));
+
+        std::ofstream of;
+        of.open(dst_file);
+        for (int i = 0; i < image.size().height; i++) {
+            for (int j = 0; j < image.size().width; j++) {
+                of << image.at<float>(i, j) << " ";
+            }
+            if (i < image.size().height - 1) of << std::endl;
+        }
+        of.close();
 
         cv::waitKey(100);
         std::cout << "Wrote " << dst_file << std::endl;

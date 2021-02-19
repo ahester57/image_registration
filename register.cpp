@@ -164,16 +164,20 @@ main(int argc, const char** argv)
                 epsilon)
         );
 
-    print_warp_matrix(warp_matrix);
-    print_results(motion_type_string, correlation_co);
 
     // warp original image using transformed warp matrix
     motion_type != cv::MOTION_HOMOGRAPHY ?
         cv::warpAffine(input_image, input_image_copy, warp_matrix, input_image.size()) :
         cv::warpPerspective(input_image, input_image_copy, warp_matrix, input_image.size());
 
+
+    print_warp_matrix(warp_matrix);
+    print_results(motion_type_string, correlation_co);
+    write_img_to_file_as_text(warp_matrix, "./out", motion_type_string + "_" + output_warp);
+
+
     cv::imshow( WINDOW_NAME + " Warped", input_image_copy  );
-    write_img_to_file(input_image_copy, "./out", warp_img_filename);
+    write_img_to_file(input_image_copy, "./out", motion_type_string + "_" + warp_img_filename);
 
     // 'event loop' for keypresses
     wait_key();
