@@ -55,6 +55,7 @@ parse_arguments(
 
     try {
         *template_filename = (std::string) parser.get<std::string>(1).c_str();
+        assert(template_filename->size() > 0);
     } catch (...) {
         std::cerr << "Failed to parse templatefile argument!:" << std::endl;
         return -1;
@@ -103,7 +104,6 @@ parse_arguments(
         std::cerr << "Failed to parse warp_img_filename argument!:" << std::endl;
         return -1;
     }
-
 
     std::cout << std::endl << "Shortcuts:" << std::endl << "\tq\t- quit" << std::endl << std::endl;
 
