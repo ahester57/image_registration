@@ -188,7 +188,7 @@ main(int argc, const char** argv)
     cv::cvtColor(input_image_copy, gray_warped, cv::COLOR_BGR2GRAY);
 
     // compute and show error
-    cv::Mat error = template_image - gray_warped;
+    cv::Mat error = gray_warped - template_image;
 
     double minVal;
     double maxVal;
